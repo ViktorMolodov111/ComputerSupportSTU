@@ -1,0 +1,145 @@
+---
+title: "Task 3 Trencin"
+author: "Viktor Molodov"
+date: "2025/11/25"
+format:
+  html:
+    embed-resources: true
+editor: source
+---
+
+## Task 3: Expanding Your Universe
+
+Your "mini-universe" in Tasks 1 & 2 was a simulation. Now, it's time to connect it to the real world.
+
+Your mission is to find a real dataset that expands on your theme, import it into R, and explore it using the dplyr package.
+
+## 3.1. The Quest: Find Your Data
+
+Find one simple, real-world dataset that fits your theme.
+
+- **Where to look:** Kaggle, TidyTuesday, data.gov, or other public data portals.
+
+- **Format:** Any format you are able to read. For simplicity it is proposed to use **textual (csv, txt)** or **Excel** format.
+
+- **Requirements:**
+
+    - At least 50 rows.
+
+    - At least 4 columns.
+
+    - A mix of numeric and character/factor data.
+
+- **Action:**
+
+    1. Download the data file and place it in your R project directory.
+
+    2. In your task file add a line with the link to the data source (e.g., Data from: https://...).
+    
+## 3.2. The Import: Load Your Data
+
+1. **Install** `tidyverse`: If you haven't, run `install.packages("tidyverse")` in your console (just once).
+
+2. **Load libraries:** At the top of your script, add `library(dplyr)` and `library(readr)` (`library(readxl)` in case of Excel file format).
+
+3. **Read the data:** Use `read_csv()` (or `read_excel()`) to load your dataset into a new data frame.
+
+```r
+# Load libraries
+library(dplyr)
+library(readr)
+
+# Load your real dataset (50 rows, 4 columns)
+trencin_data <- read_csv("trencin_data.csv")
+
+# First inspection
+glimpse(trencin_data)
+head(trencin_data)
+summary(trencin_data)
+```
+
+```r
+trencin_data %>%
+  select(street, population) %>%
+  arrange(desc(population)) %>%
+  head(5)
+```
+
+```r
+trencin_data %>%
+  distinct(district, population, district_sq_km) %>%   
+  mutate(pop_density = population / district_sq_km) %>%  
+  select(district, pop_density)
+```
+
+## 3.3. The Interrogation: Explore with `dplyr`
+
+This is the core of the task. Your goal is to **ask and answer 5 interesting questions** about your new dataset.
+
+You must write the question in plain English (as a comment), followed by the `dplyr` code that answers it.
+
+You **must** use each of the following `dplyr` "verbs" at least once:
+
+- `select()` - To pick specific columns.
+
+- `filter()` - To subset rows based on a condition.
+
+- `arrange()` - To sort your results (e.g., with desc()).
+
+- `mutate()` - To create a new column.
+
+`group_by()` and `summarise()` - To get summary statistics (like `mean()`, `n()`, `max()`, etc.).
+
+**Your 5 Questions (example):**
+
+Here are examples. **Do not copy these**. Create your own questions based on your data.
+
+**Question 1:** Which 5 streets are in the most populated areas (districts)?
+
+```r
+trencin_data %>%
+  select(street, population) %>%
+  arrange(desc(population)) %>%
+  head(5)
+```
+
+**Question 2:** What is the average district size for each district?
+
+```r
+trencin_data %>%
+  group_by(district) %>%
+  summarise(avg_district_size = mean(district_sq_km, na.rm = TRUE))
+```
+
+**Question 3:** How many streets are in each district?
+
+```r
+trencin_data %>%
+  group_by(district) %>%
+  summarise(street_count = n())
+```
+
+**Question 4:** What is the population density for each district?
+
+```r
+trencin_data %>%
+  distinct(district, population, district_sq_km) %>%
+  mutate(pop_density = population / district_sq_km) %>%
+  select(district, pop_density)
+```
+
+**Question 5:** Which streets are located in districts with population density > 2000?
+
+```r
+high_density <- trencin_data %>%
+  distinct(district, population, district_sq_km) %>%
+  mutate(pop_density = population / district_sq_km) %>%
+  filter(pop_density > 2000)
+```
+
+```r
+trencin_data %>%
+  inner_join(high_density %>% select(district), by = "district") %>%
+  mutate(pop_density = population / district_sq_km) %>%
+  select(street, district, pop_density)
+```
