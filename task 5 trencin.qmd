@@ -1,0 +1,151 @@
+---
+title: "Task 5 Trencin"
+author: "Viktor Molodov"
+date: "2025/12/08"
+format:
+  html:
+    embed-resources: true
+editor: source
+---
+
+## Task 5. Visualising Your Universe (Base R & ggplot2)
+
+You have found your data (Task 3) and built tools to analyse it (Task 4). Now, you must present your findings to customers.
+
+Your goal is to create four specific visualizations based on the real-world dataset you imported in Task 3.
+
+**Prerequisites:**
+
+  - Use the dataset you found and cleaned in Task 3.
+
+  - Make sure `library(ggplot2)` is loaded.
+
+  - **Crucial:** Every plot must have a **Title**, **x-axis label**, and **y-axis label** that make sense for your specific theme.
+  
+```{r setup}
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+trencin_data <- read_csv("trencin_data.csv", show_col_types = FALSE)
+```
+
+### 5.1. The Quick Sketch (Base R Histogram)
+
+Sometimes you need a quick look at the distribution of your data without loading heavy packages.
+
+  1. Choose one **numeric variable** from your dataset (e.g., `price`, `temperature`, `speed`).
+
+  2. Use the `hist()` function from base R.
+
+  3. Customise the `main` title, `xlab`, and the bar `col` (colour).
+
+**Example:**
+
+```{r}
+hist(trencin_data$population,
+main = "Distribution of Population in Trenčín Streets",
+xlab = "Population",
+col = "pink",
+border = "white")
+```
+
+### 5.2. The Relationship Map (ggplot2 Scatter Plot)
+
+Now, let's look for patterns using the industry-standard package, **ggplot2**.
+
+  1. Choose **two numeric variables** to see if they are correlated.
+
+  2. Create a scatter plot using `geom_point()`.
+  
+  3. Add `geom_smooth()` to add a relationship between variables to the plot.
+
+  4. Add `labs()` to rename your axes and title.
+
+**Example:**
+
+```{r}
+ggplot(trencin_data, aes(x = district_sq_km, y = population)) +
+geom_point(color = "brown", alpha = 0.7, size = 3) +
+geom_smooth(color = "gray") +
+labs(
+title = "Relationship Between Population and District Size",
+x = "District Area (km²)",
+y = "Population"
+) +
+theme_minimal()
+```
+
+### 5.3. The Comparison (ggplot2 Boxplot)
+
+3. The Comparison (ggplot2 Boxplot)
+
+Boxplots are excellent for comparing groups. Let's see how different categories in your universe perform.
+
+  1. Choose a **categorical (or logical) variable** for the X-axis (e.g., city, planet_type, species).
+
+  2. Choose a **numeric variable** for the Y-axis (e.g., price, gravity, lifespan).
+
+  3. Create a plot using `geom_boxplot()`.
+
+  4. **Bonus:** Use `fill` to colour the boxes by the same category.
+
+**Example:**
+
+```{r}
+ggplot(trencin_data, aes(x = district, y = population, color = district)) +
+  stat_summary(fun = median, geom = "crossbar", width = 0.5) +
+  labs(
+    title = "Population Distribution by District",
+    x = "District",
+    y = "Population"
+  ) +
+  theme_light()
+```
+
+### 5.4. The "Deep Dive" (Faceting or Custom)
+
+The most powerful feature of `ggplot2` is faceting—creating small multiples of the same plot for different groups.
+
+  1. Create a plot (histogram, bar plot, or scatter plot).
+
+  2. Use `facet_wrap(~ your_category_variable)` to split the plot into a separate panel for each group in your data.
+
+  3. This is incredibly useful for comparing distinct groups (e.g., separate charts for each City or Year).
+
+**Example:**
+
+```{r}
+ggplot(trencin_data, aes(x = population)) +
+geom_histogram(bins = 10, fill = "red", color = "black") +
+facet_wrap(~ district) +
+labs(
+title = "Population Distribution Across Trenčín Districts",
+x = "Population",
+y = "Count"
+)
+```
+
+### 5.5. Final Step: Exporting (Saving Your Work)
+
+A plot is useless if you can't put it in a report.
+
+  1. Choose your favourite plot from the exercises above.
+
+  2. Run the code to display it in R.
+
+  3. Immediately run the following command to save it to your project folder:
+
+```r
+ggplot(trencin_data, aes(x = district_sq_km, y = population)) +
+geom_point(color = "blue", alpha = 0.7, size = 3) +
+geom_smooth(color = "gray") +
+labs(
+title = "Saved Plot — Population vs District Size",
+x = "District Area (km²)",
+y = "Population"
+) +
+theme_minimal()
+
+ggsave("trencin_population_vs_area.png", width = 8, height = 6)
+```
